@@ -3,6 +3,8 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import requests
+from aiohttp import web
+import asyncio
 
 # Load environment variables
 load_dotenv()
@@ -50,6 +52,25 @@ async def recommend_anime(ctx, genre: str = None):
 @bot.event
 async def on_ready():
     print(f'Bot {bot.user.name} is now running.')
+
+# Function to handle the web server for Render
+async def handle(request):
+    return web.Response(text="Bot is running.")
+
+# Start the web server in a separate async loop
+async def start_web_server():
+    app = web.Application()
+    app.add_routes([web.get('/', handle)])
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    await site.start()
+
+# Run both the bot and web server
+loop = asyncio.get_event_loop()
+
+# Run web server in the background
+loop.create_task(start_web_server())
 
 # Run the bot
 bot.run(DISCORD_TOKEN)
