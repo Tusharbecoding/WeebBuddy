@@ -10,6 +10,7 @@ import asyncio
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 MAL_CLIENT_ID = os.getenv('MAL_CLIENT_ID')
+PORT = int(os.getenv('PORT', 8080))  # Use PORT from environment or default to 8080
 
 # Create bot instance
 intents = discord.Intents.default()
@@ -63,7 +64,7 @@ async def start_web_server():
     app.add_routes([web.get('/', handle)])
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    site = web.TCPSite(runner, '0.0.0.0', PORT)  # Bind to PORT variable
     await site.start()
 
 # Run both the bot and web server
